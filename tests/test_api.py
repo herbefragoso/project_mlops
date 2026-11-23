@@ -35,7 +35,7 @@ def test_predict_rejeita_quantidade_errada_de_atributos():
 def test_predict_acerta_um_caso_maligno_e_um_benigno_claros(base_holdout, campeao):
     """Escolhe os casos mais claros (maior confiança do campeão) de cada classe."""
     X = base_holdout[config.FEATURES]
-    coluna = list(campeao.classes_).index(config.CLASSE_MALIGNA)
+    coluna = list(campeao.classes_).index(config.CLASSE_POSITIVA)
     p_maligno = campeao.predict_proba(X)[:, coluna]
     i_maligno = int(p_maligno.argmax())
     i_benigno = int(p_maligno.argmin())

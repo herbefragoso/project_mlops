@@ -23,9 +23,9 @@ _modelo = joblib.load(CAMINHO_MODELO)
 
 
 class Exame(BaseModel):
-    """Os 30 atributos do exame, na mesma ordem do treino."""
+    """Os 57 atributos do e-mail, na mesma ordem do treino (config.FEATURES)."""
 
-    atributos: list[float] = Field(min_length=30, max_length=30)
+    atributos: list[float] = Field(min_length=len(config.FEATURES), max_length=len(config.FEATURES))
 
 
 class Predicao(BaseModel):
@@ -46,11 +46,11 @@ def saude() -> dict:
 def prever(exame: Exame) -> Predicao:
     entrada = pd.DataFrame([exame.atributos], columns=config.FEATURES)
     previsto = int(_modelo.predict(entrada)[0])
-    # a coluna da classe maligna (0) em predict_proba segue a ordem de classes_
-    coluna = list(_modelo.classes_).index(config.CLASSE_MALIGNA)
+    # a coluna da classe positiva em predict_proba segue a ordem de classes_
+    coluna = list(_modelo.classes_).index(config.CLASSE_POSITIVA)
     p_maligno = float(_modelo.predict_proba(entrada)[0][coluna])
     return Predicao(
-        classe="maligno" if previsto == config.CLASSE_MALIGNA else "benigno",
+        classe="maligno" if previsto == config.CLASSE_POSITIVA else "benigno",
         probabilidade_maligno=round(p_maligno, 4),
         versao_codigo=__version__,
     )

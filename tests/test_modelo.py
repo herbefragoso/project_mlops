@@ -81,10 +81,10 @@ def test_invariancia_a_ruido_minimo(modelo_atual, xy_holdout):
     assert mudou <= 0.02
 
 
-def test_direcional_tumor_maior_nao_reduz_a_chance_de_maligno(modelo_atual, xy_holdout):
-    """Teste direcional: tumor maior não pode reduzir a probabilidade média de câncer."""
+def test_direcional_mais_maiusculas_nao_reduz_a_chance_de_spam(modelo_atual, xy_holdout):
+    """Teste direcional: sequências de maiúsculas maiores não podem reduzir a chance de spam."""
     X_te, _ = xy_holdout
-    coluna = list(modelo_atual.classes_).index(config.CLASSE_MALIGNA)
+    coluna = list(modelo_atual.classes_).index(config.CLASSE_POSITIVA)
     maior = X_te.copy()
     for c in config.COLUNAS_TAMANHO:
         maior[c] = maior[c] * 1.10
