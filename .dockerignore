@@ -1,0 +1,15 @@
+.git
+.github
+.dvc
+.venv
+**/__pycache__
+.pytest_cache
+.ruff_cache
+.env
+tests
+demo
+docs
+data
+reports
+models/candidate
+*.md
