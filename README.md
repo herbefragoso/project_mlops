@@ -1,5 +1,8 @@
 # Filtro de spam com CI/CD/CT
 
+**Grupo 02:** Amabilly Riva Dutra, Erica Souza Dos Santos, Herbe Fragoso, Rafael Cassiano Manchini,
+Roger Caldeira de Oliveira e Ruan Matheus de Souza.
+
 Projeto pequeno, mas completo, que mostra como um modelo de machine learning é testado, retreinado e entregue de forma
 automática. Usa ferramentas reais: **GitHub Actions**, **pytest**, **ruff**, **DVC**, **FastAPI**, **Docker** e
 **GitHub Container Registry**.
