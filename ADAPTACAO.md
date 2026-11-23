@@ -1,5 +1,8 @@
 # Adaptação: filtro de spam (Spambase)
 
+**Grupo 02:** Amabilly Riva Dutra, Erica Souza Dos Santos, Herbe Fragoso, Rafael Cassiano Manchini,
+Roger Caldeira de Oliveira e Ruan Matheus de Souza.
+
 ## 1. Problema e dados
 
 O modelo classifica e-mails em spam (1) ou legítimo (0), para a equipe de TI filtrar a caixa de entrada.
@@ -56,8 +59,8 @@ Esses sinais mostram o que o holdout fixo não mostra: se o filtro está errando
 ## 6. Contribuição
 
 - Herbe Fragoso: troca dos dados, contrato de qualidade, pré-processamento e primeiro campeão ([PR #1](https://github.com/herbefragoso/project_mlops/pull/1))
-- Ruan: regras do domínio no `validar_dataframe` e teste novo de dados ([PR])
-- Erica: métricas do spam, portão pela precisão e teste novo de modelo ([PR])
-- Roger: simulação de drift e cenários 1 a 5 ([PR])
-- Rafael: API, teste de fumaça e testes novos de API e de código ([PR])
+- Ruan Matheus de Souza: regras do domínio no `validar_dataframe` e teste novo de dados ([PR])
+- Erica Souza Dos Santos: métricas do spam, portão pela precisão e teste novo de modelo ([PR])
+- Roger Caldeira de Oliveira: simulação de drift e cenários 1 a 5 ([PR])
+- Rafael Cassiano Manchini: API, teste de fumaça e testes novos de API e de código ([PR])
 - Amabilly Riva Dutra: README, modelo de PR, este relatório e as evidências ([PR])
