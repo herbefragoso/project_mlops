@@ -20,8 +20,8 @@ def test_arquivo_respeita_esquema_e_valores(caminho):
 
 
 def test_base_de_treino_tem_as_duas_classes_em_proporcao_razoavel(base_treino):
-    proporcao_maligna = (base_treino[config.ALVO] == config.CLASSE_MALIGNA).mean()
-    assert 0.25 <= proporcao_maligna <= 0.55
+    proporcao_spam = (base_treino[config.ALVO] == config.CLASSE_POSITIVA).mean()
+    assert 0.25 <= proporcao_spam <= 0.55
 
 
 def test_nao_ha_vazamento_entre_treino_e_holdout(base_treino, base_holdout):
@@ -36,12 +36,12 @@ def test_nao_ha_linhas_duplicadas_na_base_de_treino(base_treino):
 
 def test_validador_detecta_nulos_e_valores_negativos(base_treino):
     corrompido = base_treino.copy()
-    corrompido.loc[0, "mean radius"] = None
-    corrompido.loc[1, "mean area"] = -5.0
+    corrompido.loc[0, "word_freq_free"] = None
+    corrompido.loc[1, "capital_run_length_total"] = -5.0
     problemas = validar_dataframe(corrompido)
     assert any("nulos" in p for p in problemas)
     assert any("negativos" in p for p in problemas)
 
 
 def test_validador_detecta_esquema_diferente(base_treino):
-    assert validar_dataframe(base_treino.drop(columns=["mean radius"]))
+    assert validar_dataframe(base_treino.drop(columns=["word_freq_make"]))
