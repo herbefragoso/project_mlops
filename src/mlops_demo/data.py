@@ -4,27 +4,36 @@ Uso na linha de comando:
     python -m mlops_demo.data base      # cria base_treino.csv e base_holdout.csv (uma vez)
     python -m mlops_demo.data preparar  # junta base + lotes e gera data/processed/
     python -m mlops_demo.data validar   # valida todos os CSVs de data/raw/
+
+Fonte: Spambase, UCI Machine Learning Repository (Hopkins, Reeber, Forman e Suermondt, 1999),
+https://archive.ics.uci.edu/dataset/94/spambase, licença CC BY 4.0. O arquivo original está em
+data/fonte/spambase.data e não é alterado: a limpeza é refeita aqui, sempre do mesmo jeito.
 """
 
 import sys
 
 import pandas as pd
-from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 
 from mlops_demo import config
 
 SEMENTE_DADOS = 7  # divisão fixa da base: não mude, ou o campeão perde a referência
-N_TREINO_BASE = 300
-N_HOLDOUT_BASE = 100
+N_TREINO_BASE = 2500
+N_HOLDOUT_BASE = 900  # o que sobra (804 linhas) é a reserva de onde saem os lotes novos
 
 
 def carregar_dataset_completo() -> pd.DataFrame:
-    """Breast Cancer Wisconsin completo (569 linhas), com a coluna target."""
-    bruto = load_breast_cancer(as_frame=True)
-    df = bruto.frame.copy()
-    df.columns = [*config.FEATURES, config.ALVO]
-    return df
+    """Spambase sem linhas repetidas, com a coluna do alvo.
+
+    O arquivo original tem 4.601 e-mails, mas muitos repetem os mesmos 57 atributos: há
+    duplicatas exatas e alguns grupos com o mesmo vetor rotulado ora como spam, ora como legítimo.
+    Os grupos contraditórios saem inteiros e as duplicatas ficam com uma cópia só. Sem isso, a
+    mesma linha poderia cair no treino e no holdout (vazamento). Restam 4.204 linhas.
+    """
+    df = pd.read_csv(config.DADOS_FONTE, header=None, names=[*config.FEATURES, config.ALVO])
+    rotulos_por_vetor = df.groupby(config.FEATURES)[config.ALVO].transform("nunique")
+    df = df[rotulos_por_vetor == 1].drop_duplicates(subset=config.FEATURES)
+    return df.reset_index(drop=True)
 
 
 def dividir_dataset() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
