@@ -19,10 +19,12 @@ from mlops_demo import config
 
 SEMENTE_DADOS = 7  # divisão fixa da base: não mude, ou o campeão perde a referência
 N_TREINO_BASE = 2500
-N_HOLDOUT_BASE = 900  # o que sobra (804 linhas) é a reserva de onde saem os lotes novos
+# o que sobra (804 linhas) é a reserva de onde saem os lotes novos
+N_HOLDOUT_BASE = 900
 
 # colunas usadas pelas regras de domínio do validador
-COLUNAS_PORCENTAGEM = [c for c in config.FEATURES if c.startswith(("word_freq_", "char_freq_"))]
+COLUNAS_PORCENTAGEM = [c for c in config.FEATURES if c.startswith(
+    ("word_freq_", "char_freq_"))]
 COLUNAS_CONTAGEM = ["capital_run_length_longest", "capital_run_length_total"]
 
 
@@ -34,8 +36,10 @@ def carregar_dataset_completo() -> pd.DataFrame:
     Os grupos contraditórios saem inteiros e as duplicatas ficam com uma cópia só. Sem isso, a
     mesma linha poderia cair no treino e no holdout (vazamento). Restam 4.204 linhas.
     """
-    df = pd.read_csv(config.DADOS_FONTE, header=None, names=[*config.FEATURES, config.ALVO])
-    rotulos_por_vetor = df.groupby(config.FEATURES)[config.ALVO].transform("nunique")
+    df = pd.read_csv(config.DADOS_FONTE, header=None,
+                     names=[*config.FEATURES, config.ALVO])
+    rotulos_por_vetor = df.groupby(config.FEATURES)[
+        config.ALVO].transform("nunique")
     df = df[rotulos_por_vetor == 1].drop_duplicates(subset=config.FEATURES)
     return df.reset_index(drop=True)
 
@@ -63,22 +67,26 @@ def criar_base() -> None:
     config.DADOS_LOTES.mkdir(parents=True, exist_ok=True)
     base_treino.to_csv(config.BASE_TREINO, index=False)
     base_holdout.to_csv(config.BASE_HOLDOUT, index=False)
-    print(f"base_treino: {len(base_treino)} linhas | base_holdout: {len(base_holdout)} linhas")
+    print(
+        f"base_treino: {len(base_treino)} linhas | base_holdout: {len(base_holdout)} linhas")
 
 
 def aplicar_drift(df: pd.DataFrame, fator: float) -> pd.DataFrame:
-    """Simula equipamento recalibrado: raio e perímetro x fator, área x fator ao quadrado."""
+    """Simula mudança no perfil dos e-mails: sequências de maiúsculas multiplicadas pelo fator."""
     saida = df.copy()
     for coluna in config.COLUNAS_TAMANHO:
-        potencia = 2 if "area" in coluna else 1
-        saida[coluna] = saida[coluna] * (fator**potencia)
+        if coluna in COLUNAS_CONTAGEM:
+            saida[coluna] = (saida[coluna] * fator).round().astype(int)
+        else:
+            saida[coluna] = saida[coluna] * fator
     return saida
 
 
 def gerar_lote(nome: str, n: int = 120, fator_drift: float = 1.0, semente: int = 1) -> str:
     """Cria data/raw/lotes/<nome>.csv a partir da reserva, opcionalmente com drift."""
     _, _, reserva = dividir_dataset()
-    lote = reserva.sample(n=min(n, len(reserva)), random_state=semente).reset_index(drop=True)
+    lote = reserva.sample(n=min(n, len(reserva)),
+                          random_state=semente).reset_index(drop=True)
     if fator_drift != 1.0:
         lote = aplicar_drift(lote, fator_drift)
     config.DADOS_LOTES.mkdir(parents=True, exist_ok=True)
@@ -94,7 +102,8 @@ def validar_dataframe(df: pd.DataFrame) -> list[str]:
     if list(df.columns) != esperadas:
         faltando = sorted(set(esperadas) - set(df.columns))
         extras = sorted(set(df.columns) - set(esperadas))
-        problemas.append(f"esquema diferente do esperado (faltando={faltando}, extras={extras})")
+        problemas.append(
+            f"esquema diferente do esperado (faltando={faltando}, extras={extras})")
         return problemas
     nulos = int(df.isna().sum().sum())
     if nulos:
@@ -110,15 +119,18 @@ def validar_dataframe(df: pd.DataFrame) -> list[str]:
         problemas.append(f"porcentagens acima de 100 em {acima_de_100[:3]}")
     menores_que_1 = [c for c in config.COLUNAS_TAMANHO if (df[c] < 1).any()]
     if menores_que_1:
-        problemas.append(f"sequências de maiúsculas menores que 1 em {menores_que_1}")
+        problemas.append(
+            f"sequências de maiúsculas menores que 1 em {menores_que_1}")
     nao_inteiras = [c for c in COLUNAS_CONTAGEM if (df[c] % 1 > 0).any()]
     if nao_inteiras:
         problemas.append(f"contagens não inteiras em {nao_inteiras}")
     media = df["capital_run_length_average"]
     maior = df["capital_run_length_longest"]
-    fora_de_ordem = int(((media > maior) | (maior > df["capital_run_length_total"])).sum())
+    fora_de_ordem = int(
+        ((media > maior) | (maior > df["capital_run_length_total"])).sum())
     if fora_de_ordem:
-        problemas.append(f"{fora_de_ordem} linhas fora da ordem average <= longest <= total")
+        problemas.append(
+            f"{fora_de_ordem} linhas fora da ordem average <= longest <= total")
     return problemas
 
 
@@ -145,8 +157,10 @@ def preparar() -> None:
         treino.append(metade_treino)
         avaliacao.append(metade_aval)
     config.DADOS_PROCESSADOS.mkdir(parents=True, exist_ok=True)
-    pd.concat(treino, ignore_index=True).to_csv(config.TREINO_PROCESSADO, index=False)
-    pd.concat(avaliacao, ignore_index=True).to_csv(config.AVALIACAO_PROCESSADA, index=False)
+    pd.concat(treino, ignore_index=True).to_csv(
+        config.TREINO_PROCESSADO, index=False)
+    pd.concat(avaliacao, ignore_index=True).to_csv(
+        config.AVALIACAO_PROCESSADA, index=False)
     print(f"lotes usados: {len(listar_lotes())}")
     n_treino = sum(len(t) for t in treino)
     n_avaliacao = sum(len(a) for a in avaliacao)
