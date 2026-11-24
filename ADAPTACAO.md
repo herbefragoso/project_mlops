@@ -28,17 +28,19 @@ precisão 0,919 e recall 0,916.
 
 - [PR #1](https://github.com/herbefragoso/project_mlops/pull/1) (herbefragoso): `data/fonte/spambase.data`,
   `data/raw/*.csv`, `data.py`, `config.py`, `features.py` (log1p), `params.yaml` (class_weight null), primeiro campeão
-- [PR do Ruan]: `validar_dataframe` com as regras do domínio + teste novo de dados
-- [PR da Erica]: métricas do spam, portão pela precisão + teste novo de modelo
-- [PR do Roger]: `aplicar_drift` e cenários 1 a 5
+- [PR #3](https://github.com/herbefragoso/project_mlops/pull/3) (RuaanSouza): `validar_dataframe` com as regras do domínio + teste novo de dados
+- [PR #2](https://github.com/herbefragoso/project_mlops/pull/2) (11erica006): métricas do spam, portão pela precisão + teste novo de modelo
+- [PR #4](https://github.com/herbefragoso/project_mlops/pull/4) (rcoliveirasb): `aplicar_drift` e cenários 1 a 5
 - [PR do Rafael]: API, smoke test + testes novos de API e de código
 - [PR da Amabilly]: `README.md`, `.github/PULL_REQUEST_TEMPLATE.md` e este relatório
 
 ## 4. Evidências
 
-- E1, CI verde na main: [link]
-- E2, CI vermelho (cenário 2): [link do PR] [link da execução]
-- E3, CT com drift e portão aprovando (cenário 4): [link do CT no PR] [link do PR do robô]
+- E1, CI verde na main: [execução](https://github.com/herbefragoso/project_mlops/actions/runs/45509215343)
+- E2, CI vermelho em Validar os dados brutos (cenário 2): [PR #5](https://github.com/herbefragoso/project_mlops/pull/5),
+  [execução](https://github.com/herbefragoso/project_mlops/actions/runs/45507993169)
+- E3, CT com drift em 3 atributos e portão aprovando (cenário 4): [PR #8](https://github.com/herbefragoso/project_mlops/pull/8),
+  [execução do CT](https://github.com/herbefragoso/project_mlops/actions/runs/45510244015), [link do PR do robô]
 - E4, CT com portão reprovando (cenário 5): [link]
 - E5, CD com a tag v1.0.0: [link da execução] [link do pacote]
 
@@ -59,8 +61,8 @@ Esses sinais mostram o que o holdout fixo não mostra: se o filtro está errando
 ## 6. Contribuição
 
 - Herbe Fragoso: troca dos dados, contrato de qualidade, pré-processamento e primeiro campeão ([PR #1](https://github.com/herbefragoso/project_mlops/pull/1))
-- Ruan Matheus de Souza: regras do domínio no `validar_dataframe` e teste novo de dados ([PR])
-- Erica Souza Dos Santos: métricas do spam, portão pela precisão e teste novo de modelo ([PR])
-- Roger Caldeira de Oliveira: simulação de drift e cenários 1 a 5 ([PR])
+- Ruan Matheus de Souza: regras do domínio no `validar_dataframe` e teste novo de dados ([PR #3](https://github.com/herbefragoso/project_mlops/pull/3))
+- Erica Souza Dos Santos: métricas do spam, portão pela precisão e teste novo de modelo ([PR #2](https://github.com/herbefragoso/project_mlops/pull/2))
+- Roger Caldeira de Oliveira: simulação de drift e cenários 1 a 5 ([PR #4](https://github.com/herbefragoso/project_mlops/pull/4)) e evidências E2 a E4
 - Rafael Cassiano Manchini: API, teste de fumaça e testes novos de API e de código ([PR])
 - Amabilly Riva Dutra: README, modelo de PR, este relatório e as evidências ([PR])
