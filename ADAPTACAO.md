@@ -41,7 +41,8 @@ precisão 0,919 e recall 0,916.
   [execução](https://github.com/herbefragoso/project_mlops/actions/runs/45507993169)
 - E3, CT com drift em 3 atributos e portão aprovando (cenário 4): [PR #8](https://github.com/herbefragoso/project_mlops/pull/8),
   [execução do CT](https://github.com/herbefragoso/project_mlops/actions/runs/45510244015), [link do PR do robô]
-- E4, CT com portão reprovando (cenário 5): [link]
+- E4, CT com portão reprovando (cenário 5, execução manual na branch do PR [#9](https://github.com/herbefragoso/project_mlops/pull/9)):
+  [execução do CT](https://github.com/herbefragoso/project_mlops/actions/runs/45512194288), precisão 0,748 e recall 0,986
 - E5, CD com a tag v1.0.0: [link da execução] [link do pacote]
 
 ## 5. Limites e riscos
