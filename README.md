@@ -189,10 +189,10 @@ git branch -D cenario-N
 | N | O que muda | O que você deve observar |
 |---|---|---|
 | 1 | remove a última coluna das entradas do modelo | CI vermelho em **Testes de código** |
-| 2 | valores inválidos na base de treino (nulos e frequências fora do intervalo) | CI vermelho em **Validar os dados brutos** (antes do treino) |
-| 3 | regularização muito forte (`C` muito pequeno) | CI vermelho em **Testes de modelo**: o modelo deixa de achar o spam |
-| 4 | lote novo de e-mails com drift | CI verde. Veja o CT na seção seguinte |
-| 5 | `class_weight` extremo no `params.yaml` | CI vermelho e portão do CT reprovado: a precisão do spam cai abaixo de 0,91 |
+| 2 | 5 nulos em `word_freq_free` e 3 frequências de 150% em `word_freq_money` na base de treino | CI vermelho em **Validar os dados brutos** (antes do treino) |
+| 3 | regularização muito forte (`C: 0.0001`) | CI vermelho em **Testes de modelo**: o modelo deixa de achar o spam |
+| 4 | lote novo de 120 e-mails com as sequências de maiúsculas 2x maiores | CI verde e drift em 3 atributos. Veja o CT na seção seguinte |
+| 5 | `class_weight: {0: 1, 1: 10}` no `params.yaml` | CI vermelho em **Testes de modelo** e portão do CT reprovado: recall 0,986, precisão 0,748 |
 
 Para listar os cenários: `python demo/cenarios.py listar`.
 
@@ -210,8 +210,11 @@ O lote novo mostra que os dados mudaram. Aqui o CI fica verde, porque os dados s
 
 ### Cenário 5: o portão reprovando
 
-O cenário 5 muda o `params.yaml`, então o CT também roda no PR. O candidato marca mais e-mails como spam, o recall sobe,
-mas a precisão cai abaixo de 0,91. No **Summary** do CT, a tabela do portão mostra a regra que falhou, o job fica
+O cenário 5 muda o `params.yaml`, então o CT também começa no PR. Mas, em push e PR, o CT só retreina se houver drift,
+e este cenário não traz lote novo: o job fica verde com "Gatilho não disparado". Para ver o portão, rode o CT na branch
+do cenário: **Actions > CT > Run workflow**, escolha `cenario-5` e clique em **Run workflow** (a execução manual sempre
+retreina). O candidato marca mais e-mails como spam: o recall sobe para 0,986, mas a precisão cai para 0,748, abaixo
+de 0,91 e da precisão do campeão. No **Summary** do CT, a tabela do portão mostra as regras que falharam, o job fica
 vermelho e nada é promovido: o campeão anterior continua em produção.
 
 ### Cenário 4, modo automático: do lote novo à imagem publicada, sem ninguém
