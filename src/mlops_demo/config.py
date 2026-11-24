@@ -54,7 +54,7 @@ COLUNAS_TAMANHO = [c for c in FEATURES if c.startswith("capital_run_length")]
 # O erro mais caro é o falso positivo (e-mail legítimo na quarentena), então a precisão manda.
 PRECISAO_MINIMA = 0.91
 RECALL_MINIMO = 0.85  # sem ele, um filtro que quase nunca marca spam teria precisão alta
-TOLERANCIA_CAMPEAO = 0.0  # o candidato não pode ter recall menor que o campeão
+TOLERANCIA_CAMPEAO = 0.0  # o candidato não pode ter precisão menor que o campeão.
 PISO_SANIDADE = 0.80  # o campeão não pode colapsar na base de referência (holdout fixo)
 LIMITE_DRIFT_P = 0.01  # p-valor do teste KS
 MIN_FEATURES_DRIFT = 3  # gatilho do CT: quantos atributos com drift disparam o retreino

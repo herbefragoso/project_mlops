@@ -3,6 +3,7 @@
 import json
 
 import numpy as np
+import pandas as pd
 import pytest
 from sklearn.dummy import DummyClassifier
 
@@ -18,8 +19,8 @@ def test_campeao_versionado_foi_certificado_pelo_portao():
     """O metrics.json do campeão registra o que o portão mediu ao aprová-lo e cumpre o contrato."""
     with open(config.METRICAS_CAMPEAO, encoding="utf-8") as arquivo:
         declaradas = json.load(arquivo)
-    assert declaradas["recall_maligno"] >= config.RECALL_MINIMO, declaradas
-    assert declaradas["precisao_maligna"] >= config.PRECISAO_MINIMA, declaradas
+    assert declaradas["recall_spam"] >= config.RECALL_MINIMO, declaradas
+    assert declaradas["precisao_spam"] >= config.PRECISAO_MINIMA, declaradas
 
 
 def test_campeao_versionado_nao_colapsou_na_base_de_referencia(campeao, base_holdout):
@@ -30,15 +31,15 @@ def test_campeao_versionado_nao_colapsou_na_base_de_referencia(campeao, base_hol
     Por isso o piso aqui é menor.
     """
     metricas = avaliar(campeao, base_holdout)
-    assert metricas["recall_maligno"] >= config.PISO_SANIDADE, metricas
-    assert metricas["precisao_maligna"] >= config.PISO_SANIDADE, metricas
+    assert metricas["recall_spam"] >= config.PISO_SANIDADE, metricas
+    assert metricas["precisao_spam"] >= config.PISO_SANIDADE, metricas
 
 
 def test_treino_com_o_codigo_e_params_atuais_cumpre_o_contrato(modelo_atual, base_holdout):
     """Se alguém mexer no código ou no params.yaml, o CI treina de novo e confere os limiares."""
     metricas = avaliar(modelo_atual, base_holdout)
-    assert metricas["recall_maligno"] >= config.RECALL_MINIMO, metricas
-    assert metricas["precisao_maligna"] >= config.PRECISAO_MINIMA, metricas
+    assert metricas["recall_spam"] >= config.RECALL_MINIMO, metricas
+    assert metricas["precisao_spam"] >= config.PRECISAO_MINIMA, metricas
 
 
 def test_modelo_supera_o_baseline_ingenuo(modelo_atual, base_treino, base_holdout):
@@ -91,3 +92,36 @@ def test_direcional_mais_maiusculas_nao_reduz_a_chance_de_spam(modelo_atual, xy_
     antes = modelo_atual.predict_proba(X_te)[:, coluna].mean()
     depois = modelo_atual.predict_proba(maior)[:, coluna].mean()
     assert depois >= antes
+
+
+def test_funcionalidade_minima_dois_emails_montados_a_mao(campeao):
+    """Teste de funcionalidade mínima: dois e-mails que qualquer filtro precisa acertar."""
+    base = {c: 0.0 for c in config.FEATURES}
+    trabalho = {
+        **base,
+        "word_freq_meeting": 1.0,
+        "word_freq_project": 0.8,
+        "word_freq_re": 1.2,
+        "word_freq_edu": 0.6,
+        "capital_run_length_average": 1.5,
+        "capital_run_length_longest": 4.0,
+        "capital_run_length_total": 40.0,
+    }
+    propaganda = {
+        **base,
+        "word_freq_free": 2.0,
+        "word_freq_money": 1.5,
+        "word_freq_credit": 1.0,
+        "word_freq_000": 1.0,
+        "word_freq_your": 3.0,
+        "char_freq_exclamation": 1.0,
+        "char_freq_dollar": 0.8,
+        "capital_run_length_average": 8.0,
+        "capital_run_length_longest": 100.0,
+        "capital_run_length_total": 800.0,
+    }
+    X = pd.DataFrame([trabalho, propaganda])[config.FEATURES]
+    coluna = list(campeao.classes_).index(config.CLASSE_POSITIVA)
+    p_spam = campeao.predict_proba(X)[:, coluna]
+    assert p_spam[0] < 0.5, f"e-mail de trabalho com p(spam)={p_spam[0]:.3f}"
+    assert p_spam[1] > 0.5, f"propaganda com p(spam)={p_spam[1]:.3f}"

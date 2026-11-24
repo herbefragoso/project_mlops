@@ -46,15 +46,15 @@ def test_metricas_usam_o_spam_como_classe_positiva():
     # filtro que marca tudo como spam (1): recall 1.0 e precisão = proporção real de spam
     y_real = [0, 0, 1, 1]
     metricas = calcular_metricas(y_real, [1, 1, 1, 1])
-    assert metricas["recall_maligno"] == 1.0
-    assert metricas["precisao_maligna"] == pytest.approx(0.5)
+    assert metricas["recall_spam"] == 1.0
+    assert metricas["precisao_spam"] == pytest.approx(0.5)
 
 
 # --- o próprio portão de qualidade precisa ser testado ---------------------------------------
 
 
 def _metricas(recall, precisao):
-    return {"recall_maligno": recall, "precisao_maligna": precisao, "n_amostras": 100}
+    return {"recall_spam": recall, "precisao_spam": precisao, "n_amostras": 100}
 
 
 def test_gate_aprova_candidato_melhor_e_dentro_dos_limiares():
@@ -71,5 +71,11 @@ def test_gate_reprova_precisao_abaixo_do_limiar():
     assert not decidir(_metricas(1.0, 0.70), _metricas(0.95, 0.95))["aprovado"]
 
 
-def test_gate_reprova_candidato_pior_que_o_campeao():
-    assert not decidir(_metricas(0.92, 0.95), _metricas(0.97, 0.95))["aprovado"]
+def test_gate_reprova_precisao_pior_que_a_do_campeao():
+    # o recall melhora, mas a precisão cai em relação ao campeão: o portão olha a precisão
+    assert not decidir(_metricas(0.97, 0.93), _metricas(0.90, 0.95))["aprovado"]
+
+
+def test_gate_aprova_recall_menor_que_o_do_campeao_se_a_precisao_nao_caiu():
+    # perder recall (ainda acima do limiar) não barra mais o candidato
+    assert decidir(_metricas(0.88, 0.95), _metricas(0.97, 0.95))["aprovado"]

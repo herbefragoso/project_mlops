@@ -8,12 +8,12 @@ from mlops_demo.features import separar_xy
 
 
 def calcular_metricas(y_real, y_previsto) -> dict:
-    """Recall e precisão da classe positiva, mais a acurácia como referência."""
+    """Precisão (métrica principal) e recall da classe positiva, mais a acurácia como referência."""
     return {
-        "recall_maligno": float(recall_score(y_real, y_previsto, pos_label=CLASSE_POSITIVA)),
-        "precisao_maligna": float(
+        "precisao_spam": float(
             precision_score(y_real, y_previsto, pos_label=CLASSE_POSITIVA, zero_division=0)
         ),
+        "recall_spam": float(recall_score(y_real, y_previsto, pos_label=CLASSE_POSITIVA)),
         "acuracia": float(accuracy_score(y_real, y_previsto)),
         "n_amostras": int(len(y_real)),
     }
