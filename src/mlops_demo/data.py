@@ -19,7 +19,8 @@ from mlops_demo import config
 
 SEMENTE_DADOS = 7  # divisão fixa da base: não mude, ou o campeão perde a referência
 N_TREINO_BASE = 2500
-N_HOLDOUT_BASE = 900  # o que sobra (804 linhas) é a reserva de onde saem os lotes novos
+# o que sobra (804 linhas) é a reserva de onde saem os lotes novos
+N_HOLDOUT_BASE = 900
 
 # colunas usadas pelas regras de domínio do validador
 COLUNAS_PORCENTAGEM = [c for c in config.FEATURES if c.startswith(("word_freq_", "char_freq_"))]
@@ -67,11 +68,13 @@ def criar_base() -> None:
 
 
 def aplicar_drift(df: pd.DataFrame, fator: float) -> pd.DataFrame:
-    """Simula equipamento recalibrado: raio e perímetro x fator, área x fator ao quadrado."""
+    """Simula mudança no perfil dos e-mails: sequências de maiúsculas multiplicadas pelo fator."""
     saida = df.copy()
     for coluna in config.COLUNAS_TAMANHO:
-        potencia = 2 if "area" in coluna else 1
-        saida[coluna] = saida[coluna] * (fator**potencia)
+        if coluna in COLUNAS_CONTAGEM:
+            saida[coluna] = (saida[coluna] * fator).round().astype(int)
+        else:
+            saida[coluna] = saida[coluna] * fator
     return saida
 
 
