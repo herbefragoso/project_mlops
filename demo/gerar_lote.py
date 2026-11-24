@@ -1,8 +1,8 @@
-"""Gera um lote novo de exames em data/raw/lotes/ (com ou sem drift).
+"""Gera um lote novo de e-mails em data/raw/lotes/ (com ou sem drift).
 
 Exemplos:
     python demo/gerar_lote.py lote_02                      # sem drift
-    python demo/gerar_lote.py lote_03 --drift 0.75 --n 120
+    python demo/gerar_lote.py lote_03 --drift 2.0 --n 120 # maiúsculas 2x maiores
 """
 
 import argparse

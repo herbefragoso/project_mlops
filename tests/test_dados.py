@@ -45,3 +45,23 @@ def test_validador_detecta_nulos_e_valores_negativos(base_treino):
 
 def test_validador_detecta_esquema_diferente(base_treino):
     assert validar_dataframe(base_treino.drop(columns=["word_freq_make"]))
+
+
+@pytest.mark.parametrize(
+    ("coluna", "valor", "trecho_esperado"),
+    [
+        ("word_freq_free", 150.0, "porcentagens acima de 100"),
+        ("char_freq_exclamation", 100.5, "porcentagens acima de 100"),
+        ("capital_run_length_average", 0.5, "menores que 1"),
+        ("capital_run_length_total", 1e6 + 0.5, "não inteiras"),
+        ("capital_run_length_average", 1e6, "fora da ordem"),
+        ("capital_run_length_longest", 1e6, "fora da ordem"),
+    ],
+)
+def test_validador_detecta_regras_do_spambase(base_treino, coluna, valor, trecho_esperado):
+    corrompido = base_treino.copy()
+    corrompido[coluna] = corrompido[coluna].astype(float)  # longest e total são lidos como int
+    corrompido.loc[0, coluna] = valor
+    problemas = validar_dataframe(corrompido)
+    assert len(problemas) == 1, problemas
+    assert trecho_esperado in problemas[0]

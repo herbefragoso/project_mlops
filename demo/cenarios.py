@@ -20,9 +20,9 @@ from mlops_demo.data import gerar_lote  # noqa: E402
 DESCRICAO = {
     1: "Bug no pré-processamento: remove a última coluna. Esperado: CI falha em test_codigo.",
     2: "Dados corrompidos na base de treino. Esperado: CI falha em test_dados.",
-    3: "Hiperparâmetro ruim (C muito pequeno). Esperado: CI falha em test_modelo (recall).",
-    4: "Lote novo com drift. Esperado: CI verde e CT dispara, retreina e o portão aprova.",
-    5: "class_weight extremo. Esperado: recall 1,0, precisão baixa, CI e portão do CT reprovam.",
+    3: "Hiperparâmetro ruim (C: 0.0001). Esperado: CI falha em test_modelo (recall).",
+    4: "Lote novo com drift (maiúsculas 2x maiores). Esperado: CI verde e CT aprova.",
+    5: "class_weight extremo ({0: 1, 1: 10}). Esperado: CI e portão do CT reprovam.",
 }
 
 
@@ -45,23 +45,26 @@ def cenario_1() -> None:
 def cenario_2() -> None:
     caminho = RAIZ / "data" / "raw" / "base_treino.csv"
     df = pd.read_csv(caminho)
-    df.loc[0:4, "mean radius"] = None
-    df.loc[5:7, "mean area"] = -10.0
+    df.loc[0:4, "word_freq_free"] = None
+    df.loc[5:7, "word_freq_money"] = 150.0
     df.to_csv(caminho, index=False)
-    print("alterado: data/raw/base_treino.csv (5 nulos em mean radius, 3 áreas negativas)")
+    print(
+        "alterado: data/raw/base_treino.csv "
+        "(5 nulos em word_freq_free, 3 frequências de 150% em word_freq_money)"
+    )
 
 
 def cenario_3() -> None:
-    _substituir(RAIZ / "params.yaml", "C: 1.0", "C: 0.00005")
+    _substituir(RAIZ / "params.yaml", "C: 1.0", "C: 0.0001")
 
 
 def cenario_4() -> None:
-    caminho = gerar_lote("lote_01", n=120, fator_drift=0.75, semente=1)
-    print("criado:", Path(caminho).relative_to(RAIZ), "(atributos de tamanho 25% menores)")
+    caminho = gerar_lote("lote_01", n=120, fator_drift=2.0, semente=1)
+    print("criado:", Path(caminho).relative_to(RAIZ), "(sequências de maiúsculas 2x maiores)")
 
 
 def cenario_5() -> None:
-    _substituir(RAIZ / "params.yaml", "class_weight: balanced", "class_weight: {0: 50, 1: 1}")
+    _substituir(RAIZ / "params.yaml", "class_weight: null", "class_weight: {0: 1, 1: 10}")
 
 
 CENARIOS = {1: cenario_1, 2: cenario_2, 3: cenario_3, 4: cenario_4, 5: cenario_5}

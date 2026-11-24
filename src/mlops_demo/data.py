@@ -19,7 +19,12 @@ from mlops_demo import config
 
 SEMENTE_DADOS = 7  # divisão fixa da base: não mude, ou o campeão perde a referência
 N_TREINO_BASE = 2500
-N_HOLDOUT_BASE = 900  # o que sobra (804 linhas) é a reserva de onde saem os lotes novos
+# o que sobra (804 linhas) é a reserva de onde saem os lotes novos
+N_HOLDOUT_BASE = 900
+
+# colunas usadas pelas regras de domínio do validador
+COLUNAS_PORCENTAGEM = [c for c in config.FEATURES if c.startswith(("word_freq_", "char_freq_"))]
+COLUNAS_CONTAGEM = ["capital_run_length_longest", "capital_run_length_total"]
 
 
 def carregar_dataset_completo() -> pd.DataFrame:
@@ -63,11 +68,13 @@ def criar_base() -> None:
 
 
 def aplicar_drift(df: pd.DataFrame, fator: float) -> pd.DataFrame:
-    """Simula equipamento recalibrado: raio e perímetro x fator, área x fator ao quadrado."""
+    """Simula mudança no perfil dos e-mails: sequências de maiúsculas multiplicadas pelo fator."""
     saida = df.copy()
     for coluna in config.COLUNAS_TAMANHO:
-        potencia = 2 if "area" in coluna else 1
-        saida[coluna] = saida[coluna] * (fator**potencia)
+        if coluna in COLUNAS_CONTAGEM:
+            saida[coluna] = (saida[coluna] * fator).round().astype(int)
+        else:
+            saida[coluna] = saida[coluna] * fator
     return saida
 
 
@@ -100,6 +107,21 @@ def validar_dataframe(df: pd.DataFrame) -> list[str]:
     negativos = [c for c in config.FEATURES if (df[c] < 0).any()]
     if negativos:
         problemas.append(f"valores negativos em {negativos[:3]}")
+    # regras do Spambase: porcentagens até 100, contagens de maiúsculas inteiras e coerentes
+    acima_de_100 = [c for c in COLUNAS_PORCENTAGEM if (df[c] > 100).any()]
+    if acima_de_100:
+        problemas.append(f"porcentagens acima de 100 em {acima_de_100[:3]}")
+    menores_que_1 = [c for c in config.COLUNAS_TAMANHO if (df[c] < 1).any()]
+    if menores_que_1:
+        problemas.append(f"sequências de maiúsculas menores que 1 em {menores_que_1}")
+    nao_inteiras = [c for c in COLUNAS_CONTAGEM if (df[c] % 1 > 0).any()]
+    if nao_inteiras:
+        problemas.append(f"contagens não inteiras em {nao_inteiras}")
+    media = df["capital_run_length_average"]
+    maior = df["capital_run_length_longest"]
+    fora_de_ordem = int(((media > maior) | (maior > df["capital_run_length_total"])).sum())
+    if fora_de_ordem:
+        problemas.append(f"{fora_de_ordem} linhas fora da ordem average <= longest <= total")
     return problemas
 
 
