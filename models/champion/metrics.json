@@ -1,6 +1,6 @@
 {
-  "recall_maligno": 0.9164345403899722,
-  "precisao_maligna": 0.9189944134078212,
+  "precisao_spam": 0.9189944134078212,
+  "recall_spam": 0.9164345403899722,
   "acuracia": 0.9344444444444444,
   "n_amostras": 900,
   "origem": "base_treino.csv"
