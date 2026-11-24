@@ -29,8 +29,7 @@ DESCRICAO = {
 def _substituir(arquivo: Path, antigo: str, novo: str) -> None:
     texto = arquivo.read_text(encoding="utf-8")
     if antigo not in texto:
-        raise SystemExit(
-            f"Trecho não encontrado em {arquivo.name}. O cenário já foi aplicado?")
+        raise SystemExit(f"Trecho não encontrado em {arquivo.name}. O cenário já foi aplicado?")
     arquivo.write_text(texto.replace(antigo, novo, 1), encoding="utf-8")
     print(f"alterado: {arquivo.relative_to(RAIZ)}")
 
@@ -61,17 +60,14 @@ def cenario_3() -> None:
 
 def cenario_4() -> None:
     caminho = gerar_lote("lote_01", n=120, fator_drift=2.0, semente=1)
-    print("criado:", Path(caminho).relative_to(RAIZ),
-          "(sequências de maiúsculas 2x maiores)")
+    print("criado:", Path(caminho).relative_to(RAIZ), "(sequências de maiúsculas 2x maiores)")
 
 
 def cenario_5() -> None:
-    _substituir(RAIZ / "params.yaml", "class_weight: null",
-                "class_weight: {0: 1, 1: 10}")
+    _substituir(RAIZ / "params.yaml", "class_weight: null", "class_weight: {0: 1, 1: 10}")
 
 
-CENARIOS = {1: cenario_1, 2: cenario_2,
-            3: cenario_3, 4: cenario_4, 5: cenario_5}
+CENARIOS = {1: cenario_1, 2: cenario_2, 3: cenario_3, 4: cenario_4, 5: cenario_5}
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2 and sys.argv[1] == "listar":
@@ -80,8 +76,7 @@ if __name__ == "__main__":
     elif len(sys.argv) == 3 and sys.argv[1] == "aplicar" and sys.argv[2].isdigit():
         numero = int(sys.argv[2])
         if numero not in CENARIOS:
-            raise SystemExit(
-                "Cenário inexistente. Use: python demo/cenarios.py listar")
+            raise SystemExit("Cenário inexistente. Use: python demo/cenarios.py listar")
         print(f"Cenário {numero}: {DESCRICAO[numero]}")
         CENARIOS[numero]()
     else:
