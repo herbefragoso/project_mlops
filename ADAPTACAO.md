@@ -37,7 +37,7 @@ precisão 0,919 e recall 0,916. O atual, promovido pelo CT na E3, tem 0,924 e 0,
 
 ## 4. Evidências
 
-- E1, CI verde na main: [execução](https://github.com/herbefragoso/project_mlops/actions/runs/45514902518)
+- E1, CI verde na main: [execução](https://github.com/herbefragoso/project_mlops/actions/runs/45523629603)
 - E2, CI vermelho em Validar os dados brutos (cenário 2): [PR #5](https://github.com/herbefragoso/project_mlops/pull/5),
   [execução](https://github.com/herbefragoso/project_mlops/actions/runs/45507993169)
 - E3, CT com drift em 3 atributos e portão aprovando (cenário 4): [PR #8](https://github.com/herbefragoso/project_mlops/pull/8),
@@ -46,7 +46,8 @@ precisão 0,919 e recall 0,916. O atual, promovido pelo CT na E3, tem 0,924 e 0,
   e [PR do robô #11](https://github.com/herbefragoso/project_mlops/pull/11), com merge
 - E4, CT com portão reprovando (cenário 5, execução manual na branch do PR [#9](https://github.com/herbefragoso/project_mlops/pull/9)):
   [execução do CT](https://github.com/herbefragoso/project_mlops/actions/runs/45512194288), precisão 0,748 e recall 0,986
-- E5, CD com a tag v1.0.0: [link da execução] [link do pacote]
+- E5, CD com a tag v1.0.0: [execução](https://github.com/herbefragoso/project_mlops/actions/runs/45523800609) (CI, imagem, teste de fumaça e publicação),
+  [pacote](https://github.com/herbefragoso/project_mlops/pkgs/container/project_mlops) `ghcr.io/herbefragoso/project_mlops:1.0.0`
 
 ## 5. Limites e riscos
 
