@@ -37,7 +37,7 @@ precisão 0,919 e recall 0,916. O atual, promovido pelo CT na E3, tem 0,924 e 0,
 
 ## 4. Evidências
 
-- E1, CI verde na main: [execução](https://github.com/herbefragoso/project_mlops/actions/runs/45509215343)
+- E1, CI verde na main: [execução](https://github.com/herbefragoso/project_mlops/actions/runs/45514902518)
 - E2, CI vermelho em Validar os dados brutos (cenário 2): [PR #5](https://github.com/herbefragoso/project_mlops/pull/5),
   [execução](https://github.com/herbefragoso/project_mlops/actions/runs/45507993169)
 - E3, CT com drift em 3 atributos e portão aprovando (cenário 4): [PR #8](https://github.com/herbefragoso/project_mlops/pull/8),
