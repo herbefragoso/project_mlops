@@ -65,9 +65,17 @@ Esses sinais mostram o que o holdout fixo não mostra: se o filtro está errando
 
 ## 6. Contribuição
 
-- Herbe Fragoso: troca dos dados, contrato de qualidade, pré-processamento e primeiro campeão ([PR #1](https://github.com/herbefragoso/project_mlops/pull/1))
-- Ruan Matheus de Souza: regras do domínio no `validar_dataframe` e teste novo de dados ([PR #3](https://github.com/herbefragoso/project_mlops/pull/3))
-- Erica Souza Dos Santos: métricas do spam, portão pela precisão e teste novo de modelo ([PR #2](https://github.com/herbefragoso/project_mlops/pull/2))
-- Roger Caldeira de Oliveira: simulação de drift e cenários 1 a 5 ([PR #4](https://github.com/herbefragoso/project_mlops/pull/4)) e evidências E2 a E4
-- Rafael Cassiano Manchini: API, teste de fumaça e testes novos de API e de código ([PR #12](https://github.com/herbefragoso/project_mlops/pull/12))
-- Amabilly Riva Dutra: README, modelo de PR, este relatório, as evidências E1, E3 (PR do robô) e E5 e a correção da E4 ([PR #13](https://github.com/herbefragoso/project_mlops/pull/13))
+- **Herbe Fragoso:** projeto base (workflows de CI, CT e CD, DVC, Dockerfile e cenários de prática); troca
+  dos dados pelo Spambase sem duplicatas, contrato de qualidade, log1p em `features.py`, `class_weight` em
+  `params.yaml` e primeiro campeão ([PR #1](https://github.com/herbefragoso/project_mlops/pull/1)). Dono do repositório.
+- **Erica Souza Dos Santos:** métricas do spam em `evaluate.py`, portão pela precisão em `gate.py` e
+  `config.py`, testes de código e de modelo ([PR #2](https://github.com/herbefragoso/project_mlops/pull/2)).
+- **Ruan Matheus de Souza:** regras do domínio do Spambase no `validar_dataframe` e teste que confere a
+  linha corrompida em cada regra ([PR #3](https://github.com/herbefragoso/project_mlops/pull/3)).
+- **Roger Caldeira de Oliveira:** simulação de drift em `data.py`, gerador de lotes e cenários 1 a 5
+  ([PR #4](https://github.com/herbefragoso/project_mlops/pull/4)); execuções das evidências E2 ([PR #5](https://github.com/herbefragoso/project_mlops/pull/5)), E3 no PR ([PR #8](https://github.com/herbefragoso/project_mlops/pull/8)) e cenário 5
+  ([PR #9](https://github.com/herbefragoso/project_mlops/pull/9)).
+- **Rafael Cassiano Manchini:** API em termos de spam, recusa de atributos negativos, teste de fumaça e
+  testes novos de API e de código ([PR #12](https://github.com/herbefragoso/project_mlops/pull/12)).
+- **Amabilly Riva Dutra:** README, modelo de PR e este relatório ([PR #13](https://github.com/herbefragoso/project_mlops/pull/13)); evidências E1, E3 na
+  main ([PR #10](https://github.com/herbefragoso/project_mlops/pull/10) e PR do robô [#11](https://github.com/herbefragoso/project_mlops/pull/11)), CT manual da E4 e tag `v1.0.0` da E5.
