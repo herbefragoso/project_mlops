@@ -30,5 +30,5 @@ with open(HOLDOUT, encoding="utf-8") as arquivo:
     linha = next(csv.DictReader(arquivo))
 linha.pop("spam")  # a coluna do alvo (config.ALVO) não é atributo de entrada
 predicao = chamar("/predict", {"atributos": [float(v) for v in linha.values()]})
-assert predicao["classe"] in {"maligno", "benigno"}, predicao
+assert predicao["classe"] in {"spam", "legitimo"}, predicao
 print("predict ok |", predicao)
