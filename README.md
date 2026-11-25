@@ -98,7 +98,8 @@ python demo/local.py ct
 ```
 
 **5. Suba a API e teste.** O `/predict` recebe os 57 atributos de um e-mail, na ordem de `config.FEATURES`, e responde
-se ele é spam e com qual probabilidade.
+`classe` (`spam` ou `legitimo`), `probabilidade_spam` e `versao_codigo`. Atributo negativo, NaN ou infinito, ou
+uma quantidade diferente de 57, volta como erro 422, com o índice do atributo recusado.
 
 ```bash
 uvicorn mlops_demo.api:app --reload
