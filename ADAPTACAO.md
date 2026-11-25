@@ -21,8 +21,9 @@ documentação do dataset chama de "muito indesejável". Por isso a métrica pri
   spam teria precisão alta);
 - o candidato não pode ter precisão menor que a do campeão, no mesmo conjunto.
 
-Sem log1p e com class_weight balanced, a precisão no holdout era 0,900. O campeão atual tem
-precisão 0,919 e recall 0,916.
+Sem log1p e com class_weight balanced, a precisão no holdout era 0,900. O primeiro campeão teve
+precisão 0,919 e recall 0,916. O atual, promovido pelo CT na E3, tem 0,924 e 0,922 em 960 e-mails
+(o holdout mais a metade de avaliação do lote).
 
 ## 3. O que mudou, arquivo por arquivo
 
@@ -42,7 +43,7 @@ precisão 0,919 e recall 0,916.
 - E3, CT com drift em 3 atributos e portão aprovando (cenário 4): [PR #8](https://github.com/herbefragoso/project_mlops/pull/8),
   [CT no PR](https://github.com/herbefragoso/project_mlops/actions/runs/45510244015);
   depois do merge do lote ([PR #10](https://github.com/herbefragoso/project_mlops/pull/10)), [CT na main](https://github.com/herbefragoso/project_mlops/actions/runs/45513473971)
-  e [PR do robô #11](https://github.com/herbefragoso/project_mlops/pull/11)
+  e [PR do robô #11](https://github.com/herbefragoso/project_mlops/pull/11), com merge
 - E4, CT com portão reprovando (cenário 5, execução manual na branch do PR [#9](https://github.com/herbefragoso/project_mlops/pull/9)):
   [execução do CT](https://github.com/herbefragoso/project_mlops/actions/runs/45512194288), precisão 0,748 e recall 0,986
 - E5, CD com a tag v1.0.0: [link da execução] [link do pacote]

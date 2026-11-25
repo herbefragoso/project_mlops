@@ -56,7 +56,8 @@ isso a precisão é a métrica principal:
 - recall do spam **>= 0,85** (sem ele, um filtro que quase nunca marca spam teria precisão alta)
 - o candidato não pode ter precisão menor que a do campeão, medida **no mesmo conjunto**
 
-O campeão atual tem precisão 0,919 e recall 0,916 no holdout de 900 e-mails.
+O primeiro campeão tinha precisão 0,919 e recall 0,916 no holdout de 900 e-mails. O atual, promovido pelo CT depois do
+lote do cenário 4, tem precisão 0,924 e recall 0,922 em 960 e-mails (o holdout mais a metade de avaliação do lote).
 
 ---
 
