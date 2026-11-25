@@ -7,6 +7,7 @@ Docker:  docker run -p 8000:8000 mlops-demo
 import json
 import os
 from pathlib import Path
+from typing import Annotated
 
 import joblib
 import pandas as pd
@@ -18,19 +19,29 @@ from mlops_demo import __version__, config
 CAMINHO_MODELO = Path(os.environ.get("MODEL_PATH", config.MODELO_CAMPEAO))
 CAMINHO_METRICAS = CAMINHO_MODELO.with_name("metrics.json")
 
-app = FastAPI(title="Triagem de tumores (demo CI/CD/CT)", version=__version__)
+app = FastAPI(title="Filtro de spam (demo CI/CD/CT)", version=__version__)
 _modelo = joblib.load(CAMINHO_MODELO)
 
+# Todo atributo do Spambase é uma frequência (%) ou uma contagem de maiúsculas: nunca negativo.
+# A barreira fica na entrada porque o log1p do pipeline transforma valores menores que -1 em NaN
+# e o classificador quebra (HTTP 500); entre -1 e 0 seria pior: uma previsão sem sentido e sem
+# erro. NaN e infinito também são recusados. Tudo isso vira HTTP 422, com o índice do atributo.
+AtributoDoEmail = Annotated[float, Field(ge=0, allow_inf_nan=False)]
 
-class Exame(BaseModel):
+
+class Email(BaseModel):
     """Os 57 atributos do e-mail, na mesma ordem do treino (config.FEATURES)."""
 
-    atributos: list[float] = Field(min_length=len(config.FEATURES), max_length=len(config.FEATURES))
+    atributos: list[AtributoDoEmail] = Field(
+        min_length=len(config.FEATURES),
+        max_length=len(config.FEATURES),
+        description="Frequências de palavras e caracteres (%) e contagens de maiúsculas, >= 0.",
+    )
 
 
 class Predicao(BaseModel):
-    classe: str
-    probabilidade_maligno: float
+    classe: str  # "spam" ou "legitimo"
+    probabilidade_spam: float
     versao_codigo: str
 
 
@@ -43,14 +54,14 @@ def saude() -> dict:
 
 
 @app.post("/predict", response_model=Predicao)
-def prever(exame: Exame) -> Predicao:
-    entrada = pd.DataFrame([exame.atributos], columns=config.FEATURES)
+def prever(email: Email) -> Predicao:
+    entrada = pd.DataFrame([email.atributos], columns=config.FEATURES)
     previsto = int(_modelo.predict(entrada)[0])
     # a coluna da classe positiva em predict_proba segue a ordem de classes_
     coluna = list(_modelo.classes_).index(config.CLASSE_POSITIVA)
-    p_maligno = float(_modelo.predict_proba(entrada)[0][coluna])
+    p_spam = float(_modelo.predict_proba(entrada)[0][coluna])
     return Predicao(
-        classe="maligno" if previsto == config.CLASSE_POSITIVA else "benigno",
-        probabilidade_maligno=round(p_maligno, 4),
+        classe="spam" if previsto == config.CLASSE_POSITIVA else "legitimo",
+        probabilidade_spam=round(p_spam, 4),
         versao_codigo=__version__,
     )
