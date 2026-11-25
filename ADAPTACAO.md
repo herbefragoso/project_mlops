@@ -63,7 +63,7 @@ Em produção, monitoraríamos os e-mails resgatados da quarentena (os falsos po
 e-mails marcados como spam por dia, o drift dos atributos e a precisão numa amostra rotulada por pessoas.
 Esses sinais mostram o que o holdout fixo não mostra: se o filtro está errando com os e-mails de hoje.
 
-## 6. Contribuição
+## 6. Contribuição e uso de IA
 
 - **Herbe Fragoso:** projeto base (workflows de CI, CT e CD, DVC, Dockerfile e cenários de prática); troca
   dos dados pelo Spambase sem duplicatas, contrato de qualidade, log1p em `features.py`, `class_weight` em
@@ -79,3 +79,6 @@ Esses sinais mostram o que o holdout fixo não mostra: se o filtro está errando
   testes novos de API e de código ([PR #12](https://github.com/herbefragoso/project_mlops/pull/12)).
 - **Amabilly Riva Dutra:** README, modelo de PR e este relatório ([PR #13](https://github.com/herbefragoso/project_mlops/pull/13)); evidências E1, E3 na
   main ([PR #10](https://github.com/herbefragoso/project_mlops/pull/10) e PR do robô [#11](https://github.com/herbefragoso/project_mlops/pull/11)), CT manual da E4 e tag `v1.0.0` da E5.
+
+**Uso de IA:** todos os integrantes usaram IA como apoio no trabalho. O Herbe usou o Claude Code na análise do
+dataset, no PR #1 e no roteiro com código testado de cada parte.
