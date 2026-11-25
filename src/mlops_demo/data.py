@@ -27,6 +27,15 @@ COLUNAS_PORCENTAGEM = [c for c in config.FEATURES if c.startswith(("word_freq_",
 COLUNAS_CONTAGEM = ["capital_run_length_longest", "capital_run_length_total"]
 
 
+def salvar_csv(df: pd.DataFrame, caminho) -> None:
+    """Grava o CSV sempre com fim de linha LF.
+
+    O padrão do pandas é o do sistema (CRLF no Windows). Com LF fixo, o arquivo tem os mesmos
+    bytes em qualquer máquina e o DVC calcula o mesmo hash no Windows e no GitHub Actions.
+    """
+    df.to_csv(caminho, index=False, lineterminator="\n")
+
+
 def carregar_dataset_completo() -> pd.DataFrame:
     """Spambase sem linhas repetidas, com a coluna do alvo.
 
@@ -62,8 +71,8 @@ def criar_base() -> None:
     base_treino, base_holdout, _ = dividir_dataset()
     config.DADOS_BRUTOS.mkdir(parents=True, exist_ok=True)
     config.DADOS_LOTES.mkdir(parents=True, exist_ok=True)
-    base_treino.to_csv(config.BASE_TREINO, index=False)
-    base_holdout.to_csv(config.BASE_HOLDOUT, index=False)
+    salvar_csv(base_treino, config.BASE_TREINO)
+    salvar_csv(base_holdout, config.BASE_HOLDOUT)
     print(f"base_treino: {len(base_treino)} linhas | base_holdout: {len(base_holdout)} linhas")
 
 
@@ -86,7 +95,7 @@ def gerar_lote(nome: str, n: int = 120, fator_drift: float = 1.0, semente: int =
         lote = aplicar_drift(lote, fator_drift)
     config.DADOS_LOTES.mkdir(parents=True, exist_ok=True)
     caminho = config.DADOS_LOTES / f"{nome}.csv"
-    lote.to_csv(caminho, index=False)
+    salvar_csv(lote, caminho)
     return str(caminho)
 
 
@@ -148,8 +157,8 @@ def preparar() -> None:
         treino.append(metade_treino)
         avaliacao.append(metade_aval)
     config.DADOS_PROCESSADOS.mkdir(parents=True, exist_ok=True)
-    pd.concat(treino, ignore_index=True).to_csv(config.TREINO_PROCESSADO, index=False)
-    pd.concat(avaliacao, ignore_index=True).to_csv(config.AVALIACAO_PROCESSADA, index=False)
+    salvar_csv(pd.concat(treino, ignore_index=True), config.TREINO_PROCESSADO)
+    salvar_csv(pd.concat(avaliacao, ignore_index=True), config.AVALIACAO_PROCESSADA)
     print(f"lotes usados: {len(listar_lotes())}")
     n_treino = sum(len(t) for t in treino)
     n_avaliacao = sum(len(a) for a in avaliacao)

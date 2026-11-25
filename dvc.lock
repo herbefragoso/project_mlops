@@ -5,39 +5,39 @@ stages:
     deps:
     - path: data/raw
       hash: md5
-      md5: c53172e3452cf7e83fd570e9c44080c8.dir
-      size: 824624
-      nfiles: 3
+      md5: dd57186b6b869027de2c100d5ba46c6d.dir
+      size: 851228
+      nfiles: 4
     - path: src/mlops_demo/data.py
       hash: md5
-      md5: b955c8860b280da417eff50e89e3dcb5
-      size: 6798
+      md5: 5d42ebd58288e5e25019aad03cf9ccf6
+      size: 8337
     outs:
     - path: data/processed
       hash: md5
-      md5: da090b2cccdafb4ed19fe5ff8eb2e855.dir
-      size: 824624
+      md5: a4033c120e980a374e792c7659e1325f.dir
+      size: 850272
       nfiles: 2
   treinar:
     cmd: python -m mlops_demo.train
     deps:
     - path: data/processed
       hash: md5
-      md5: da090b2cccdafb4ed19fe5ff8eb2e855.dir
-      size: 824624
+      md5: a4033c120e980a374e792c7659e1325f.dir
+      size: 850272
       nfiles: 2
     - path: src/mlops_demo/evaluate.py
       hash: md5
-      md5: 19b9cabca00a7b689b5e3bb6a7ece480
-      size: 985
+      md5: ca51b701a7844a8038d7b4e458a8a082
+      size: 1000
     - path: src/mlops_demo/features.py
       hash: md5
       md5: 03d3fd3ac01035676dad68ff5ec07919
       size: 1528
     - path: src/mlops_demo/train.py
       hash: md5
-      md5: dc9c820c8166509c2f65adf1c41a44bb
-      size: 2119
+      md5: 60764ba48284d7feefb02f6a293996be
+      size: 2237
     params:
       params.yaml:
         modelo:
@@ -48,10 +48,10 @@ stages:
     outs:
     - path: models/candidate
       hash: md5
-      md5: e2c55207730c30b9c89852d47672426b.dir
+      md5: a51f2650fa92a90b3e15c812cf0cf2ba.dir
       size: 5953
       nfiles: 1
     - path: reports/candidate_metrics.json
       hash: md5
-      md5: 4a9a63550bed5fbc6f13f1f42302a7d2
-      size: 144
+      md5: 01a5ec736297eb94ec6d649b602fc282
+      size: 133

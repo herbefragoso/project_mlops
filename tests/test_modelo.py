@@ -26,7 +26,8 @@ def test_campeao_versionado_foi_certificado_pelo_portao():
 def test_campeao_versionado_nao_colapsou_na_base_de_referencia(campeao, base_holdout):
     """Sanidade: o artefato carrega, prevê e não perdeu o básico no holdout fixo.
 
-    O contrato de 0,90 é medido pelo portão, no conjunto de avaliação da época da promoção.
+    O contrato (precisão >= 0,91 e recall >= 0,85) é medido pelo portão, no conjunto de avaliação
+    da época da promoção.
     Depois que o modelo se adapta a dados novos, o holdout antigo pode cair um pouco.
     Por isso o piso aqui é menor.
     """
