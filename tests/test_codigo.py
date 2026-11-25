@@ -79,3 +79,13 @@ def test_gate_reprova_precisao_pior_que_a_do_campeao():
 def test_gate_aprova_recall_menor_que_o_do_campeao_se_a_precisao_nao_caiu():
     # perder recall (ainda acima do limiar) não barra mais o candidato
     assert decidir(_metricas(0.88, 0.95), _metricas(0.97, 0.95))["aprovado"]
+
+
+def test_pipeline_quebra_com_atributo_negativo_por_isso_a_api_barra(base_treino, params):
+    """Sem a barreira da API, um negativo chega ao log1p, vira NaN e o classificador quebra."""
+    X, y = separar_xy(base_treino)
+    pipeline = construir_pipeline(params).fit(X, y)
+    email = X.iloc[[0]].copy()
+    email["capital_run_length_total"] = -5.0  # log1p(-5) = NaN
+    with pytest.warns(RuntimeWarning), pytest.raises(ValueError, match="NaN"):
+        pipeline.predict(email)
