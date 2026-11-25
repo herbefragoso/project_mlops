@@ -29,7 +29,8 @@ def salvar(modelo, metricas: dict, caminho_modelo, caminho_metricas) -> None:
     caminho_modelo.parent.mkdir(parents=True, exist_ok=True)
     caminho_metricas.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(modelo, caminho_modelo)
-    with open(caminho_metricas, "w", encoding="utf-8") as arquivo:
+    # newline="\n": o JSON de métricas é saída do DVC e precisa ter o mesmo hash em qualquer sistema
+    with open(caminho_metricas, "w", encoding="utf-8", newline="\n") as arquivo:
         json.dump(metricas, arquivo, indent=2, ensure_ascii=False)
 
 
