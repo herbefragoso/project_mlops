@@ -1,11 +1,26 @@
-# Projeto de demonstração: CI/CD/CT para ML
+# Filtro de spam com CI/CD/CT
+
+**Grupo 02:** Amabilly Riva Dutra, Erica Souza Dos Santos, Herbe Fragoso, Rafael Cassiano Manchini,
+Roger Caldeira de Oliveira e Ruan Matheus de Souza.
 
 Projeto pequeno, mas completo, que mostra como um modelo de machine learning é testado, retreinado e entregue de forma
 automática. Usa ferramentas reais: **GitHub Actions**, **pytest**, **ruff**, **DVC**, **FastAPI**, **Docker** e
 **GitHub Container Registry**.
 
-O modelo é uma regressão logística que classifica tumores de mama (dataset Breast Cancer do scikit-learn).
-A classe de interesse é a **maligna** (rótulo `0`), então medimos **recall** e **precisão** dela.
+O modelo é uma regressão logística que classifica e-mails em **spam** (rótulo `1`) ou **legítimo** (rótulo `0`), para a
+equipe de TI filtrar a caixa de entrada. A classe de interesse é o spam, então medimos **precisão** e **recall** dela.
+O que mudou em relação ao projeto original, e por quê, está em [`ADAPTACAO.md`](ADAPTACAO.md).
+
+## Dados
+
+- **Fonte:** Spambase, UCI Machine Learning Repository (Hopkins, Reeber, Forman e Suermondt, 1999),
+  <https://archive.ics.uci.edu/dataset/94/spambase>. Licença CC BY 4.0.
+- **Arquivo original:** `data/fonte/spambase.data`, sem alteração (4.601 e-mails, 57 atributos numéricos: frequência de
+  48 palavras, de 6 caracteres e 3 medidas de sequências de letras maiúsculas).
+- **Limpeza:** o `data.py` remove 391 duplicatas exatas e 3 grupos com o mesmo vetor rotulado de formas diferentes.
+  Restam 4.204 linhas (39,9% de spam).
+- **Divisão** (semente fixa, sem sobreposição): treino com 2.500 linhas (`data/raw/base_treino.csv`), holdout com 900
+  (`data/raw/base_holdout.csv`) e uma reserva de 804, de onde saem os lotes novos (`data/raw/lotes/`).
 
 ## O que cada letra faz neste projeto
 
@@ -18,25 +33,31 @@ A classe de interesse é a **maligna** (rótulo `0`), então medimos **recall** 
 ## Estrutura
 
 ```
-projeto_ci_cd_ct/
+project_mlops/
   .github/workflows/     ci.yml, ct.yml, cd.yml
   src/mlops_demo/        config, data, features, evaluate, train, gate, monitor, api
   tests/                 test_codigo, test_dados, test_modelo, test_api
+  data/fonte/            spambase.data (arquivo original da UCI)
   data/raw/              base_treino.csv, base_holdout.csv e lotes/ (lotes novos chegam aqui)
   models/champion/       o modelo em produção (versionado no Git)
   params.yaml            hiperparâmetros (mudou aqui? o CI treina de novo e confere os limiares)
   dvc.yaml               pipeline: preparar e treinar
   Dockerfile             imagem da API com o modelo campeão
   demo/                  cenários de prática, gerador de lotes, teste de fumaça e execução local
+  ADAPTACAO.md           relatório da adaptação ao Spambase
 ```
 
 ## Contrato de qualidade
 
-Definido em `src/mlops_demo/config.py`:
+Definido em `src/mlops_demo/config.py`. O erro mais caro é o **falso positivo** (um e-mail legítimo na quarentena), por
+isso a precisão é a métrica principal:
 
-- recall da classe maligna **>= 0,90**
-- precisão da classe maligna **>= 0,90** (sem ela, um modelo que chuta tudo como maligno teria recall 1,0)
-- o candidato não pode ter recall menor que o do campeão, medido **no mesmo conjunto**
+- precisão do spam **>= 0,91**
+- recall do spam **>= 0,85** (sem ele, um filtro que quase nunca marca spam teria precisão alta)
+- o candidato não pode ter precisão menor que a do campeão, medida **no mesmo conjunto**
+
+O primeiro campeão tinha precisão 0,919 e recall 0,916 no holdout de 900 e-mails. O atual, promovido pelo CT depois do
+lote do cenário 4, tem precisão 0,924 e recall 0,922 em 960 e-mails (o holdout mais a metade de avaliação do lote).
 
 ---
 
@@ -76,7 +97,9 @@ python demo/local.py ci
 python demo/local.py ct
 ```
 
-**5. Suba a API e teste.**
+**5. Suba a API e teste.** O `/predict` recebe os 57 atributos de um e-mail, na ordem de `config.FEATURES`, e responde
+`classe` (`spam` ou `legitimo`), `probabilidade_spam` e `versao_codigo`. Atributo negativo, NaN ou infinito, ou
+uma quantidade diferente de 57, volta como erro 422, com o índice do atributo recusado.
 
 ```bash
 uvicorn mlops_demo.api:app --reload
@@ -168,10 +191,10 @@ git branch -D cenario-N
 | N | O que muda | O que você deve observar |
 |---|---|---|
 | 1 | remove a última coluna das entradas do modelo | CI vermelho em **Testes de código** |
-| 2 | nulos e áreas negativas na base de treino | CI vermelho em **Validar os dados brutos** (antes do treino) |
-| 3 | regularização muito forte (`C: 0.00005`) | CI vermelho em **Testes de modelo**: recall abaixo de 0,90 |
-| 4 | lote novo com drift (tamanhos 25% menores) | CI verde. Veja o CT na seção seguinte |
-| 5 | `class_weight` extremo na classe maligna | CI vermelho: recall 1,0, mas precisão abaixo de 0,90 |
+| 2 | 5 nulos em `word_freq_free` e 3 frequências de 150% em `word_freq_money` na base de treino | CI vermelho em **Validar os dados brutos** (antes do treino) |
+| 3 | regularização muito forte (`C: 0.0001`) | CI vermelho em **Testes de modelo**: o modelo deixa de achar o spam |
+| 4 | lote novo de 120 e-mails com as sequências de maiúsculas 2x maiores | CI verde e drift em 3 atributos. Veja o CT na seção seguinte |
+| 5 | `class_weight: {0: 1, 1: 10}` no `params.yaml` | CI vermelho em **Testes de modelo** e portão do CT reprovado: recall 0,986, precisão 0,748 |
 
 Para listar os cenários: `python demo/cenarios.py listar`.
 
@@ -187,11 +210,20 @@ O lote novo mostra que os dados mudaram. Aqui o CI fica verde, porque os dados s
    **Approve and run workflows**.
 4. Revise o PR (só `models/champion/` muda) e faça o merge. O CT propõe, uma pessoa decide.
 
+### Cenário 5: o portão reprovando
+
+O cenário 5 muda o `params.yaml`, então o CT também começa no PR. Mas, em push e PR, o CT só retreina se houver drift,
+e este cenário não traz lote novo: o job fica verde com "Gatilho não disparado". Para ver o portão, rode o CT na branch
+do cenário: **Actions > CT > Run workflow**, escolha `cenario-5` e clique em **Run workflow** (a execução manual sempre
+retreina). O candidato marca mais e-mails como spam: o recall sobe para 0,986, mas a precisão cai para 0,748, abaixo
+de 0,91 e da precisão do campeão. No **Summary** do CT, a tabela do portão mostra as regras que falharam, o job fica
+vermelho e nada é promovido: o campeão anterior continua em produção.
+
 ### Cenário 4, modo automático: do lote novo à imagem publicada, sem ninguém
 
 No modo anterior, uma pessoa aprova o PR e outra cria a tag. Quando o portão de qualidade já é a regra de negócio
-("só entra modelo com recall e precisão de pelo menos 0,90 e que não piore o campeão"), dá para automatizar tudo. O CT
-passa a publicar o campeão na `main`, criar a tag da nova versão e disparar o CD.
+("só entra modelo com precisão de pelo menos 0,91, recall de pelo menos 0,85 e que não piore a precisão do campeão"),
+dá para automatizar tudo. O CT passa a publicar o campeão na `main`, criar a tag da nova versão e disparar o CD.
 
 **Antes de começar (uma vez):**
 
@@ -253,13 +285,13 @@ python demo/smoke_test.py http://localhost:8000
 
 | Comando | Para que serve |
 |---|---|
-| `python -m mlops_demo.data validar` | valida o esquema e os valores de todos os CSVs de `data/raw/` |
+| `python -m mlops_demo.data validar` | valida o esquema e as regras do domínio em todos os CSVs de `data/raw/` |
 | `python -m mlops_demo.monitor` | compara os lotes novos com a base (teste KS) e diz se o gatilho dispara |
 | `dvc repro` | roda `preparar` e `treinar`, refazendo só o que mudou |
 | `python -m mlops_demo.gate` | compara candidato e campeão. Sai com código 1 se reprovar |
 | `python -m mlops_demo.gate --promover` | copia o candidato para `models/champion/` |
 | `python demo/cenarios.py listar` | lista os cenários de prática |
-| `python demo/gerar_lote.py lote_02 --drift 0.75` | gera um lote novo de exames |
+| `python demo/gerar_lote.py lote_02 --drift 0.75` | gera um lote novo de e-mails a partir da reserva |
 
 ## Se algo der errado
 
@@ -279,5 +311,7 @@ python demo/smoke_test.py http://localhost:8000
 
 - Os dados são pequenos e ficam no Git. Em um projeto real, use `dvc add` com um *remote* (S3, GCS, Azure ou outro).
 - O modelo é simples de propósito, para o treino levar poucos segundos.
+- Os dados são de 1999 e os e-mails legítimos vieram de uma única pessoa. Os limites que isso traz estão na seção 5 do
+  [`ADAPTACAO.md`](ADAPTACAO.md).
 - O `GITHUB_TOKEN` padrão é suficiente aqui. Em produção, o PR de promoção costuma usar um *GitHub App* ou um token
   dedicado, para o CI rodar sozinho nele.
