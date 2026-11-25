@@ -33,7 +33,7 @@ precisão 0,919 e recall 0,916. O atual, promovido pelo CT na E3, tem 0,924 e 0,
 - [PR #2](https://github.com/herbefragoso/project_mlops/pull/2) (11erica006): métricas do spam, portão pela precisão + teste novo de modelo
 - [PR #4](https://github.com/herbefragoso/project_mlops/pull/4) (rcoliveirasb): `aplicar_drift` e cenários 1 a 5
 - [PR #12](https://github.com/herbefragoso/project_mlops/pull/12) (rodyneyh): `api.py` (respostas spam/legitimo, recusa atributo negativo), smoke test + testes novos de API e de código
-- [PR da Amabilly]: `README.md`, `.github/PULL_REQUEST_TEMPLATE.md` e este relatório
+- [PR #13](https://github.com/herbefragoso/project_mlops/pull/13) (Mabynha20): `README.md`, `.github/PULL_REQUEST_TEMPLATE.md` e este relatório
 
 ## 4. Evidências
 
@@ -70,4 +70,4 @@ Esses sinais mostram o que o holdout fixo não mostra: se o filtro está errando
 - Erica Souza Dos Santos: métricas do spam, portão pela precisão e teste novo de modelo ([PR #2](https://github.com/herbefragoso/project_mlops/pull/2))
 - Roger Caldeira de Oliveira: simulação de drift e cenários 1 a 5 ([PR #4](https://github.com/herbefragoso/project_mlops/pull/4)) e evidências E2 a E4
 - Rafael Cassiano Manchini: API, teste de fumaça e testes novos de API e de código ([PR #12](https://github.com/herbefragoso/project_mlops/pull/12))
-- Amabilly Riva Dutra: README, modelo de PR, este relatório e as evidências ([PR])
+- Amabilly Riva Dutra: README, modelo de PR, este relatório, as evidências E1, E3 (PR do robô) e E5 e a correção da E4 ([PR #13](https://github.com/herbefragoso/project_mlops/pull/13))
